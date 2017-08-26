@@ -10,7 +10,11 @@
   },
   "author": "Vladimir Zeifman",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "exports-loader": "^0.6.4",
+    "imports-loader": "^0.7.1",
+    "three": "^0.87.1"
+  },
   "devDependencies": {
     "css-loader": "^0.28.5",
     "eslint": "^4.5.0",
