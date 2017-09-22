@@ -1,37 +1,25 @@
-import * as THREE from 'three';
-import OrbitControls from 'imports-loader?THREE=three!exports-loader?THREE.OrbitControls!three-extras/controls/OrbitControls';
-
 import './styles.css';
+import World from './World';
+import AudioAnalyser from './audio/AudioAnalyser';
+import AudioPlayer from './audio/AudioPlayer';
+import Cubes from './effects/Cubes';
+import config from '../config.json';
 
 
-const FOV = 45,
-    ASPECT = window.innerWidth / window.innerHeight,
-    NEAR = 0.1,
-    FAR = 1000;
+const audioPlayer = new AudioPlayer();
+audioPlayer.mount(document.body);
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const fftSize = 256;
+const audioAnalyser = new AudioAnalyser(audioPlayer.audioElement, fftSize);
 
-/* eslint-disable no-unused-vars */
-const controls = new OrbitControls(camera, renderer.domElement);
-/* eslint-enable no-unused-vars */
+const world = new World(audioAnalyser);
 
-const GRID_SIZE = 100;
-const GRID_STEP = 10;
-const gridHelper = new THREE.GridHelper(GRID_SIZE, GRID_STEP);
-scene.add(gridHelper);
+// effects
+const cubesEffect = new Cubes(audioAnalyser.getFrequencyBinCount());
+world.addEffect(cubesEffect);
 
-camera.position.set(0, 5, 50);
-camera.lookAt(scene.position);
+audioPlayer.play(
+    `https://api.soundcloud.com/tracks/${config.TRACK_ID}/stream?client_id=${config.SOUNDCLOUD_API_KEY}`
+);
 
-
-function render() {
-    requestAnimationFrame(render);
-
-    renderer.render(scene, camera);
-}
-
-render();
+world.render();
